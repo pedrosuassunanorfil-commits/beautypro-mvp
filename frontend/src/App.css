@@ -12,7 +12,6 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #fafafa;
 }
 
 .App {
@@ -68,93 +67,792 @@ input:focus, textarea:focus, select:focus {
   animation: spin 1s linear infinite;
 }
 
-/* Glass morphism effect */
-.glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+/* ===== DEFAULT THEME ===== */
+.theme-default {
+  background-color: #fafafa;
 }
 
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #10b981, #06b6d4, #3b82f6);
-  background-size: 200% 200%;
+/* Landing Page - Default Theme */
+.landing-bg-default {
+  background: linear-gradient(135deg, #ecfdf5 0%, #e0f2fe 50%, #dbeafe 100%);
+}
+
+.hero-text-default {
+  background: linear-gradient(135deg, #047857, #0891b2, #1d4ed8);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gradient-animation 3s ease infinite;
 }
 
-@keyframes gradient-animation {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+.hero-subtitle-default {
+  color: #64748b;
 }
 
-/* Card hover effects */
-.card-hover {
-  transition: all 0.3s ease;
+.section-title-default {
+  color: #1e293b;
 }
 
-.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+.feature-card-default {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
 }
 
-/* Button animations */
-.btn-scale:hover {
-  transform: scale(1.05);
+.card-title-default {
+  color: #1e293b;
 }
 
-.btn-scale:active {
-  transform: scale(0.95);
+.card-text-default {
+  color: #64748b;
 }
 
-/* Responsive design helpers */
-@media (max-width: 768px) {
-  .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  
-  .text-6xl {
-    font-size: 2.5rem;
-  }
-  
-  .text-4xl {
-    font-size: 1.875rem;
-  }
+/* Auth Page - Default Theme */
+.auth-bg-default {
+  background: linear-gradient(135deg, #ecfdf5 0%, #e0f2fe 50%, #dbeafe 100%);
 }
 
-/* Custom styling for form elements */
-.form-input {
+.auth-card-default {
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  transition: all 0.2s ease;
 }
 
-.form-input:focus {
-  background: rgba(255, 255, 255, 1);
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+.auth-title-default {
+  color: #1e293b;
 }
 
-/* Success and error states */
-.success {
-  color: #059669;
-  background-color: #ecfdf5;
-  border-color: #6ee7b7;
+.auth-subtitle-default {
+  color: #64748b;
 }
 
-.error {
-  color: #dc2626;
-  background-color: #fef2f2;
-  border-color: #fca5a5;
+.auth-label-default {
+  color: #374151;
+}
+
+.auth-input-default {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #d1d5db;
+}
+
+.auth-back-btn-default {
+  color: #64748b;
+}
+
+/* Dashboard - Default Theme */
+.dashboard-bg-default {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.dashboard-header-default {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+}
+
+.header-title-default {
+  color: #1e293b;
+}
+
+.header-subtitle-default {
+  color: #64748b;
+}
+
+.logout-btn-default {
+  color: #64748b;
+}
+
+.logout-btn-default:hover {
+  color: #1e293b;
+}
+
+.booking-link-card-default {
+  background: linear-gradient(135deg, #fef3c7, #fed7aa);
+  border-left: 4px solid #f59e0b;
+}
+
+.booking-link-title-default {
+  color: #92400e;
+}
+
+.booking-link-subtitle-default {
+  color: #b45309;
+}
+
+.booking-link-input-default {
+  background: white;
+  border: 1px solid #fbbf24;
+}
+
+.booking-link-btn-default {
+  border: 1px solid #f59e0b;
+  color: #b45309;
+}
+
+.booking-link-btn-default:hover {
+  background: #fef3c7;
+}
+
+.tabs-list-default {
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.tab-card-default {
+  background: white;
+}
+
+.tab-card-title-default {
+  color: #1e293b;
+}
+
+.tab-card-subtitle-default {
+  color: #64748b;
+}
+
+.service-item-default {
+  background: #f8fafc;
+}
+
+.service-item-title-default {
+  color: #1e293b;
+}
+
+.service-item-subtitle-default {
+  color: #64748b;
+}
+
+.financial-item-default {
+  background: #f8fafc;
+}
+
+.financial-item-title-default {
+  color: #1e293b;
+}
+
+.financial-item-subtitle-default {
+  color: #64748b;
+}
+
+.appointment-card-pending-default {
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+}
+
+.appointment-confirmed-default {
+  background: #ecfdf5;
+  border: 1px solid #6ee7b7;
+}
+
+.appointment-name-default {
+  color: #1e293b;
+}
+
+.appointment-detail-default {
+  color: #64748b;
+}
+
+.empty-state-default {
+  color: #9ca3af;
+}
+
+.report-card-income-default {
+  background: #ecfdf5;
+}
+
+.report-card-expense-default {
+  background: #fef2f2;
+}
+
+.report-card-balance-default {
+  background: #eff6ff;
+}
+
+.report-label-default {
+  color: #6b7280;
+}
+
+.theme-label-default {
+  color: #374151;
+}
+
+/* Booking Page - Default Theme */
+.booking-bg-default {
+  background: linear-gradient(135deg, #ecfdf5 0%, #e0f2fe 100%);
+}
+
+.booking-card-default {
+  background: white;
+}
+
+.booking-main-card-default {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+}
+
+.booking-text-default {
+  color: #64748b;
+}
+
+.booking-error-title-default {
+  color: #1e293b;
+}
+
+.booking-error-text-default {
+  color: #64748b;
+}
+
+.booking-label-default {
+  color: #374151;
+}
+
+.booking-input-default {
+  background: white;
+  border: 1px solid #d1d5db;
+}
+
+.booking-select-default {
+  background: white;
+  border: 1px solid #d1d5db;
+}
+
+.booking-textarea-default {
+  background: white;
+  border: 1px solid #d1d5db;
+}
+
+.booking-warning-default {
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+}
+
+.booking-warning-text-default {
+  color: #92400e;
+}
+
+/* ===== DARK THEME ===== */
+.theme-dark {
+  background-color: #0f0f0f;
+}
+
+/* Landing Page - Dark Theme */
+.landing-bg-dark {
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #262626 100%);
+}
+
+.hero-text-dark {
+  background: linear-gradient(135deg, #22c55e, #06b6d4, #3b82f6);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle-dark {
+  color: #a1a1aa;
+}
+
+.section-title-dark {
+  color: #f4f4f5;
+}
+
+.feature-card-dark {
+  background: rgba(39, 39, 42, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+.card-title-dark {
+  color: #f4f4f5;
+}
+
+.card-text-dark {
+  color: #a1a1aa;
+}
+
+/* Auth Page - Dark Theme */
+.auth-bg-dark {
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #262626 100%);
+}
+
+.auth-card-dark {
+  background: rgba(39, 39, 42, 0.9);
+  backdrop-filter: blur(8px);
+}
+
+.auth-title-dark {
+  color: #f4f4f5;
+}
+
+.auth-subtitle-dark {
+  color: #a1a1aa;
+}
+
+.auth-label-dark {
+  color: #d4d4d8;
+}
+
+.auth-input-dark {
+  background: rgba(39, 39, 42, 0.7);
+  border: 1px solid #52525b;
+  color: #f4f4f5;
+}
+
+.auth-back-btn-dark {
+  color: #a1a1aa;
+}
+
+/* Dashboard - Dark Theme */
+.dashboard-bg-dark {
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+}
+
+.dashboard-header-dark {
+  background: rgba(39, 39, 42, 0.8);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #3f3f46;
+}
+
+.header-title-dark {
+  color: #f4f4f5;
+}
+
+.header-subtitle-dark {
+  color: #a1a1aa;
+}
+
+.logout-btn-dark {
+  color: #a1a1aa;
+}
+
+.logout-btn-dark:hover {
+  color: #f4f4f5;
+}
+
+.booking-link-card-dark {
+  background: linear-gradient(135deg, #451a03, #7c2d12);
+  border-left: 4px solid #ea580c;
+}
+
+.booking-link-title-dark {
+  color: #fed7aa;
+}
+
+.booking-link-subtitle-dark {
+  color: #fdba74;
+}
+
+.booking-link-input-dark {
+  background: #27272a;
+  border: 1px solid #52525b;
+  color: #f4f4f5;
+}
+
+.booking-link-btn-dark {
+  border: 1px solid #ea580c;
+  color: #fed7aa;
+  background: transparent;
+}
+
+.booking-link-btn-dark:hover {
+  background: #451a03;
+}
+
+.tabs-list-dark {
+  background: #27272a;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border: 1px solid #3f3f46;
+}
+
+.tab-card-dark {
+  background: #27272a;
+}
+
+.tab-card-title-dark {
+  color: #f4f4f5;
+}
+
+.tab-card-subtitle-dark {
+  color: #a1a1aa;
+}
+
+.service-item-dark {
+  background: #18181b;
+}
+
+.service-item-title-dark {
+  color: #f4f4f5;
+}
+
+.service-item-subtitle-dark {
+  color: #a1a1aa;
+}
+
+.financial-item-dark {
+  background: #18181b;
+}
+
+.financial-item-title-dark {
+  color: #f4f4f5;
+}
+
+.financial-item-subtitle-dark {
+  color: #a1a1aa;
+}
+
+.appointment-card-pending-dark {
+  background: #451a03;
+  border: 1px solid #ea580c;
+}
+
+.appointment-confirmed-dark {
+  background: #052e16;
+  border: 1px solid #16a34a;
+}
+
+.appointment-name-dark {
+  color: #f4f4f5;
+}
+
+.appointment-detail-dark {
+  color: #a1a1aa;
+}
+
+.empty-state-dark {
+  color: #71717a;
+}
+
+.report-card-income-dark {
+  background: #052e16;
+}
+
+.report-card-expense-dark {
+  background: #450a0a;
+}
+
+.report-card-balance-dark {
+  background: #0c1445;
+}
+
+.report-label-dark {
+  color: #a1a1aa;
+}
+
+.theme-label-dark {
+  color: #d4d4d8;
+}
+
+/* Booking Page - Dark Theme */
+.booking-bg-dark {
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+}
+
+.booking-card-dark {
+  background: #27272a;
+}
+
+.booking-main-card-dark {
+  background: rgba(39, 39, 42, 0.9);
+  backdrop-filter: blur(8px);
+}
+
+.booking-text-dark {
+  color: #a1a1aa;
+}
+
+.booking-error-title-dark {
+  color: #f4f4f5;
+}
+
+.booking-error-text-dark {
+  color: #a1a1aa;
+}
+
+.booking-label-dark {
+  color: #d4d4d8;
+}
+
+.booking-input-dark {
+  background: #18181b;
+  border: 1px solid #3f3f46;
+  color: #f4f4f5;
+}
+
+.booking-select-dark {
+  background: #18181b;
+  border: 1px solid #3f3f46;
+  color: #f4f4f5;
+}
+
+.booking-textarea-dark {
+  background: #18181b;
+  border: 1px solid #3f3f46;
+  color: #f4f4f5;
+}
+
+.booking-warning-dark {
+  background: #451a03;
+  border: 1px solid #ea580c;
+}
+
+.booking-warning-text-dark {
+  color: #fed7aa;
+}
+
+/* ===== PINK THEME ===== */
+.theme-pink {
+  background-color: #fdf2f8;
+}
+
+/* Landing Page - Pink Theme */
+.landing-bg-pink {
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #f9a8d4 100%);
+}
+
+.hero-text-pink {
+  background: linear-gradient(135deg, #be185d, #c2410c, #7c3aed);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle-pink {
+  color: #831843;
+}
+
+.section-title-pink {
+  color: #9d174d;
+}
+
+.feature-card-pink {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+}
+
+.card-title-pink {
+  color: #9d174d;
+}
+
+.card-text-pink {
+  color: #831843;
+}
+
+/* Auth Page - Pink Theme */
+.auth-bg-pink {
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #f9a8d4 100%);
+}
+
+.auth-card-pink {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+.auth-title-pink {
+  color: #9d174d;
+}
+
+.auth-subtitle-pink {
+  color: #831843;
+}
+
+.auth-label-pink {
+  color: #9d174d;
+}
+
+.auth-input-pink {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #f472b6;
+}
+
+.auth-back-btn-pink {
+  color: #831843;
+}
+
+/* Dashboard - Pink Theme */
+.dashboard-bg-pink {
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+}
+
+.dashboard-header-pink {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #f472b6;
+}
+
+.header-title-pink {
+  color: #9d174d;
+}
+
+.header-subtitle-pink {
+  color: #831843;
+}
+
+.logout-btn-pink {
+  color: #831843;
+}
+
+.logout-btn-pink:hover {
+  color: #9d174d;
+}
+
+.booking-link-card-pink {
+  background: linear-gradient(135deg, #fce7f3, #f9a8d4);
+  border-left: 4px solid #ec4899;
+}
+
+.booking-link-title-pink {
+  color: #9d174d;
+}
+
+.booking-link-subtitle-pink {
+  color: #be185d;
+}
+
+.booking-link-input-pink {
+  background: white;
+  border: 1px solid #f472b6;
+}
+
+.booking-link-btn-pink {
+  border: 1px solid #ec4899;
+  color: #be185d;
+}
+
+.booking-link-btn-pink:hover {
+  background: #fce7f3;
+}
+
+.tabs-list-pink {
+  background: white;
+  box-shadow: 0 1px 3px rgba(236, 72, 153, 0.1);
+  border: 1px solid #f472b6;
+}
+
+.tab-card-pink {
+  background: white;
+}
+
+.tab-card-title-pink {
+  color: #9d174d;
+}
+
+.tab-card-subtitle-pink {
+  color: #831843;
+}
+
+.service-item-pink {
+  background: #fdf2f8;
+}
+
+.service-item-title-pink {
+  color: #9d174d;
+}
+
+.service-item-subtitle-pink {
+  color: #831843;
+}
+
+.financial-item-pink {
+  background: #fdf2f8;
+}
+
+.financial-item-title-pink {
+  color: #9d174d;
+}
+
+.financial-item-subtitle-pink {
+  color: #831843;
+}
+
+.appointment-card-pending-pink {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+}
+
+.appointment-confirmed-pink {
+  background: #fce7f3;
+  border: 1px solid #ec4899;
+}
+
+.appointment-name-pink {
+  color: #9d174d;
+}
+
+.appointment-detail-pink {
+  color: #831843;
+}
+
+.empty-state-pink {
+  color: #be185d;
+}
+
+.report-card-income-pink {
+  background: #fce7f3;
+}
+
+.report-card-expense-pink {
+  background: #fef2f2;
+}
+
+.report-card-balance-pink {
+  background: #f3e8ff;
+}
+
+.report-label-pink {
+  color: #831843;
+}
+
+.theme-label-pink {
+  color: #9d174d;
+}
+
+/* Booking Page - Pink Theme */
+.booking-bg-pink {
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+}
+
+.booking-card-pink {
+  background: white;
+}
+
+.booking-main-card-pink {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+.booking-text-pink {
+  color: #831843;
+}
+
+.booking-error-title-pink {
+  color: #9d174d;
+}
+
+.booking-error-text-pink {
+  color: #831843;
+}
+
+.booking-label-pink {
+  color: #9d174d;
+}
+
+.booking-input-pink {
+  background: white;
+  border: 1px solid #f472b6;
+}
+
+.booking-select-pink {
+  background: white;
+  border: 1px solid #f472b6;
+}
+
+.booking-textarea-pink {
+  background: white;
+  border: 1px solid #f472b6;
+}
+
+.booking-warning-pink {
+  background: #fce7f3;
+  border: 1px solid #ec4899;
+}
+
+.booking-warning-text-pink {
+  color: #9d174d;
 }
 
 /* Print styles for reports */
@@ -166,14 +864,6 @@ input:focus, textarea:focus, select:focus {
   .print-friendly {
     background: white !important;
     color: black !important;
-  }
-}
-
-/* Dark mode support (for future enhancement) */
-@media (prefers-color-scheme: dark) {
-  .auto-dark {
-    background-color: #1f2937;
-    color: #f9fafb;
   }
 }
 
@@ -198,37 +888,6 @@ input:focus, textarea:focus, select:focus {
 
 .fade-in {
   animation: fadeIn 0.6s ease forwards;
-}
-
-/* Pulse animation for important elements */
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-.pulse-animation {
-  animation: pulse 2s infinite;
-}
-
-/* Custom gradient backgrounds */
-.gradient-bg-primary {
-  background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
-}
-
-.gradient-bg-secondary {
-  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
-}
-
-.gradient-bg-success {
-  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-}
-
-.gradient-bg-danger {
-  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
 }
 
 /* Text selection styles */

@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Textarea } from './components/ui/textarea';
 import { Label } from './components/ui/label';
 import { Separator } from './components/ui/separator';
+import { Switch } from './components/ui/switch';
 import { toast } from 'sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -29,10 +30,36 @@ axios.interceptors.request.use((config) => {
   return config;
 });
 
+// Theme Context
+const ThemeContext = React.createContext();
+
+const ThemeProvider = ({ children }) => {
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('theme') || 'default';
+  });
+
+  const toggleTheme = (newTheme) => {
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      <div className={`theme-${theme}`}>
+        {children}
+      </div>
+    </ThemeContext.Provider>
+  );
+};
+
+const useTheme = () => React.useContext(ThemeContext);
+
 // Landing Page Component
 const LandingPage = ({ onShowAuth }) => {
+  const { theme } = useTheme();
+  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50">
+    <div className={`min-h-screen landing-bg-${theme}`}>
       {/* Header */}
       <header className="container mx-auto px-4 py-6 flex justify-between items-center">
         <div className="flex items-center space-x-2">
@@ -54,10 +81,10 @@ const LandingPage = ({ onShowAuth }) => {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
-        <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-emerald-700 via-cyan-700 to-blue-700 bg-clip-text text-transparent leading-tight">
+        <h1 className={`text-6xl font-bold mb-6 hero-text-${theme} leading-tight`}>
           Gerencie seu Negócio de Estética
         </h1>
-        <p className="text-xl text-slate-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+        <p className={`text-xl hero-subtitle-${theme} mb-10 max-w-3xl mx-auto leading-relaxed`}>
           Sistema completo para profissionais de estética com agendamento online, controle financeiro e gestão de serviços. Tudo o que você precisa em um só lugar.
         </p>
         <Button 
@@ -72,43 +99,43 @@ const LandingPage = ({ onShowAuth }) => {
 
       {/* Features Section */}
       <section className="container mx-auto px-4 py-20">
-        <h2 className="text-4xl font-bold text-center mb-16 text-slate-800">
+        <h2 className={`text-4xl font-bold text-center mb-16 section-title-${theme}`}>
           Funcionalidades Principais
         </h2>
         <div className="grid md:grid-cols-3 gap-8">
-          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white/80 backdrop-blur-sm">
+          <Card className={`border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 feature-card-${theme}`}>
             <CardHeader>
               <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
                 <span className="text-2xl">📅</span>
               </div>
-              <CardTitle className="text-xl text-slate-800">Agendamento Online</CardTitle>
+              <CardTitle className={`text-xl card-title-${theme}`}>Agendamento Online</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-600">Link personalizado para seus clientes agendarem serviços diretamente. Aceite, recuse ou remarque com facilidade.</p>
+              <p className={`card-text-${theme}`}>Link personalizado para seus clientes agendarem serviços diretamente. Aceite, recuse ou remarque com facilidade.</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white/80 backdrop-blur-sm">
+          <Card className={`border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 feature-card-${theme}`}>
             <CardHeader>
               <div className="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mb-4">
                 <span className="text-2xl">💰</span>
               </div>
-              <CardTitle className="text-xl text-slate-800">Controle Financeiro</CardTitle>
+              <CardTitle className={`text-xl card-title-${theme}`}>Controle Financeiro</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-600">Registre entradas e saídas, acompanhe seu balanço em tempo real com filtros por período e categoria.</p>
+              <p className={`card-text-${theme}`}>Registre entradas e saídas, acompanhe seu balanço em tempo real com filtros por período e categoria.</p>
             </CardContent>
           </Card>
 
-          <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white/80 backdrop-blur-sm">
+          <Card className={`border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 feature-card-${theme}`}>
             <CardHeader>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <span className="text-2xl">⚙️</span>
               </div>
-              <CardTitle className="text-xl text-slate-800">Gestão de Serviços</CardTitle>
+              <CardTitle className={`text-xl card-title-${theme}`}>Gestão de Serviços</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-600">Cadastre seus serviços, defina preços, duração e categorias. Mantenha seu catálogo sempre organizado.</p>
+              <p className={`card-text-${theme}`}>Cadastre seus serviços e produtos, defina preços, duração e controle estoque. Mantenha seu catálogo sempre organizado.</p>
             </CardContent>
           </Card>
         </div>
@@ -142,6 +169,7 @@ const LandingPage = ({ onShowAuth }) => {
 
 // Auth Component
 const AuthComponent = ({ onLoginSuccess, onBack }) => {
+  const { theme } = useTheme();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -173,23 +201,23 @@ const AuthComponent = ({ onLoginSuccess, onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-cyan-50 to-blue-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-2xl border-0 bg-white/90 backdrop-blur-sm">
+    <div className={`min-h-screen auth-bg-${theme} flex items-center justify-center p-4`}>
+      <Card className={`w-full max-w-md shadow-2xl border-0 auth-card-${theme}`}>
         <CardHeader className="space-y-2">
           <div className="flex items-center justify-between">
             <Button 
               variant="ghost" 
               onClick={onBack}
-              className="text-slate-600"
+              className={`auth-back-btn-${theme}`}
               data-testid="auth-back-btn"
             >
               ← Voltar
             </Button>
           </div>
-          <CardTitle className="text-2xl text-center text-slate-800">
+          <CardTitle className={`text-2xl text-center auth-title-${theme}`}>
             {isLogin ? 'Entrar' : 'Criar Conta'}
           </CardTitle>
-          <CardDescription className="text-center text-slate-600">
+          <CardDescription className={`text-center auth-subtitle-${theme}`}>
             {isLogin ? 'Acesse sua conta' : 'Cadastre-se no BeautyPro'}
           </CardDescription>
         </CardHeader>
@@ -198,7 +226,7 @@ const AuthComponent = ({ onLoginSuccess, onBack }) => {
             {!isLogin && (
               <>
                 <div>
-                  <Label htmlFor="name">Nome Completo</Label>
+                  <Label htmlFor="name" className={`auth-label-${theme}`}>Nome Completo</Label>
                   <Input
                     id="name"
                     type="text"
@@ -206,11 +234,12 @@ const AuthComponent = ({ onLoginSuccess, onBack }) => {
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     required={!isLogin}
+                    className={`auth-input-${theme}`}
                     data-testid="auth-name-input"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="business_name">Nome do Negócio</Label>
+                  <Label htmlFor="business_name" className={`auth-label-${theme}`}>Nome do Negócio</Label>
                   <Input
                     id="business_name"
                     type="text"
@@ -218,11 +247,12 @@ const AuthComponent = ({ onLoginSuccess, onBack }) => {
                     value={formData.business_name}
                     onChange={(e) => setFormData({...formData, business_name: e.target.value})}
                     required={!isLogin}
+                    className={`auth-input-${theme}`}
                     data-testid="auth-business-input"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="phone">Telefone</Label>
+                  <Label htmlFor="phone" className={`auth-label-${theme}`}>Telefone</Label>
                   <Input
                     id="phone"
                     type="tel"
@@ -230,6 +260,7 @@ const AuthComponent = ({ onLoginSuccess, onBack }) => {
                     value={formData.phone}
                     onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     required={!isLogin}
+                    className={`auth-input-${theme}`}
                     data-testid="auth-phone-input"
                   />
                 </div>
@@ -237,7 +268,7 @@ const AuthComponent = ({ onLoginSuccess, onBack }) => {
             )}
             
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className={`auth-label-${theme}`}>Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -245,12 +276,13 @@ const AuthComponent = ({ onLoginSuccess, onBack }) => {
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
                 required
+                className={`auth-input-${theme}`}
                 data-testid="auth-email-input"
               />
             </div>
             
             <div>
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password" className={`auth-label-${theme}`}>Senha</Label>
               <Input
                 id="password"
                 type="password"
@@ -258,6 +290,7 @@ const AuthComponent = ({ onLoginSuccess, onBack }) => {
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
                 required
+                className={`auth-input-${theme}`}
                 data-testid="auth-password-input"
               />
             </div>
@@ -288,8 +321,30 @@ const AuthComponent = ({ onLoginSuccess, onBack }) => {
   );
 };
 
+// Theme Selector Component
+const ThemeSelector = () => {
+  const { theme, toggleTheme } = useTheme();
+
+  return (
+    <div className="flex items-center space-x-2">
+      <Label htmlFor="theme-select" className={`theme-label-${theme}`}>Tema:</Label>
+      <Select value={theme} onValueChange={toggleTheme}>
+        <SelectTrigger className="w-32" data-testid="theme-selector">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="default">Padrão</SelectItem>
+          <SelectItem value="dark">Preto</SelectItem>
+          <SelectItem value="pink">Rosa</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+};
+
 // Dashboard Component
 const Dashboard = ({ user, onLogout }) => {
+  const { theme } = useTheme();
   const [services, setServices] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [financialEntries, setFinancialEntries] = useState([]);
@@ -302,7 +357,8 @@ const Dashboard = ({ user, onLogout }) => {
     description: '',
     price: '',
     duration_minutes: '',
-    category: 'service'
+    category: 'service',
+    stock_quantity: ''
   });
 
   // Financial form state
@@ -313,6 +369,21 @@ const Dashboard = ({ user, onLogout }) => {
     category: '',
     service_id: '',
     date: new Date().toISOString().split('T')[0]
+  });
+
+  // Reschedule dialog state
+  const [rescheduleDialog, setRescheduleDialog] = useState({
+    open: false,
+    appointment: null,
+    proposals: {
+      date1: '',
+      time1: '',
+      date2: '',
+      time2: '',
+      date3: '',
+      time3: '',
+      message: ''
+    }
   });
 
   useEffect(() => {
@@ -342,17 +413,20 @@ const Dashboard = ({ user, onLogout }) => {
   const handleCreateService = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API}/services`, {
+      const payload = {
         ...serviceForm,
         price: parseFloat(serviceForm.price),
-        duration_minutes: parseInt(serviceForm.duration_minutes)
-      });
+        duration_minutes: serviceForm.category === 'service' ? parseInt(serviceForm.duration_minutes) : 0,
+        stock_quantity: serviceForm.category === 'product' ? parseInt(serviceForm.stock_quantity) : null
+      };
+
+      await axios.post(`${API}/services`, payload);
       
-      toast.success('Serviço criado com sucesso!');
-      setServiceForm({ name: '', description: '', price: '', duration_minutes: '', category: 'service' });
+      toast.success(`${serviceForm.category === 'service' ? 'Serviço' : 'Produto'} criado com sucesso!`);
+      setServiceForm({ name: '', description: '', price: '', duration_minutes: '', category: 'service', stock_quantity: '' });
       loadDashboardData();
     } catch (error) {
-      toast.error('Erro ao criar serviço');
+      toast.error(`Erro ao criar ${serviceForm.category === 'service' ? 'serviço' : 'produto'}`);
     }
   };
 
@@ -394,6 +468,20 @@ const Dashboard = ({ user, onLogout }) => {
     }
   };
 
+  const handleProposeReschedule = async () => {
+    try {
+      const response = await axios.post(`${API}/appointments/${rescheduleDialog.appointment.id}/propose-reschedule`, rescheduleDialog.proposals);
+      
+      toast.success('Proposta de reagendamento enviada!');
+      toast.info('Mensagem WhatsApp: ' + response.data.whatsapp_message.substring(0, 100) + '...');
+      
+      setRescheduleDialog({ open: false, appointment: null, proposals: {} });
+      loadDashboardData();
+    } catch (error) {
+      toast.error('Erro ao enviar proposta de reagendamento');
+    }
+  };
+
   const getBookingLink = () => {
     return `${window.location.origin}/booking/${user.id}`;
   };
@@ -405,37 +493,40 @@ const Dashboard = ({ user, onLogout }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+      <div className={`min-h-screen dashboard-bg-${theme} flex items-center justify-center`}>
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Carregando dashboard...</p>
+          <p className={`dashboard-text-${theme}`}>Carregando dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className={`min-h-screen dashboard-bg-${theme}`}>
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-slate-200">
+      <header className={`dashboard-header-${theme} shadow-sm border-b border-slate-200`}>
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 bg-gradient-to-r from-emerald-600 to-cyan-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">✨</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-800">{user.business_name}</h1>
-              <p className="text-sm text-slate-600">Olá, {user.name}</p>
+              <h1 className={`text-xl font-bold header-title-${theme}`}>{user.business_name}</h1>
+              <p className={`text-sm header-subtitle-${theme}`}>Olá, {user.name}</p>
             </div>
           </div>
-          <Button 
-            variant="ghost" 
-            onClick={onLogout}
-            className="text-slate-600 hover:text-slate-800"
-            data-testid="dashboard-logout-btn"
-          >
-            Sair
-          </Button>
+          <div className="flex items-center space-x-4">
+            <ThemeSelector />
+            <Button 
+              variant="ghost" 
+              onClick={onLogout}
+              className={`logout-btn-${theme}`}
+              data-testid="dashboard-logout-btn"
+            >
+              Sair
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -472,10 +563,10 @@ const Dashboard = ({ user, onLogout }) => {
         </div>
 
         {/* Booking Link */}
-        <Card className="mb-8 border-0 shadow-lg bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-l-amber-500">
+        <Card className={`mb-8 border-0 shadow-lg booking-link-card-${theme}`}>
           <CardHeader>
-            <CardTitle className="text-lg text-amber-800">Link de Agendamento</CardTitle>
-            <CardDescription className="text-amber-700">
+            <CardTitle className={`text-lg booking-link-title-${theme}`}>Link de Agendamento</CardTitle>
+            <CardDescription className={`booking-link-subtitle-${theme}`}>
               Compartilhe este link com seus clientes para agendamentos online
             </CardDescription>
           </CardHeader>
@@ -484,13 +575,13 @@ const Dashboard = ({ user, onLogout }) => {
               <Input 
                 value={getBookingLink()} 
                 readOnly 
-                className="bg-white border-amber-200"
+                className={`booking-link-input-${theme}`}
                 data-testid="booking-link-input"
               />
               <Button 
                 onClick={copyBookingLink}
                 variant="outline"
-                className="border-amber-500 text-amber-700 hover:bg-amber-100"
+                className={`booking-link-btn-${theme}`}
                 data-testid="copy-booking-link-btn"
               >
                 Copiar
@@ -501,7 +592,7 @@ const Dashboard = ({ user, onLogout }) => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="services" className="space-y-6">
-          <TabsList className="grid grid-cols-4 bg-white shadow-sm border border-slate-200">
+          <TabsList className={`grid grid-cols-4 tabs-list-${theme}`}>
             <TabsTrigger value="services" data-testid="services-tab">Serviços</TabsTrigger>
             <TabsTrigger value="financial" data-testid="financial-tab">Financeiro</TabsTrigger>
             <TabsTrigger value="appointments" data-testid="appointments-tab">Agendamentos</TabsTrigger>
@@ -511,14 +602,27 @@ const Dashboard = ({ user, onLogout }) => {
           {/* Services Tab */}
           <TabsContent value="services" className="space-y-6">
             <div className="grid lg:grid-cols-2 gap-6">
-              <Card className="border-0 shadow-lg">
+              <Card className={`border-0 shadow-lg tab-card-${theme}`}>
                 <CardHeader>
-                  <CardTitle>Cadastrar Serviço</CardTitle>
+                  <CardTitle className={`tab-card-title-${theme}`}>Cadastrar Item</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleCreateService} className="space-y-4">
+                    <Select
+                      value={serviceForm.category}
+                      onValueChange={(value) => setServiceForm({...serviceForm, category: value})}
+                    >
+                      <SelectTrigger data-testid="service-category-select">
+                        <SelectValue placeholder="Tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="service">Serviço</SelectItem>
+                        <SelectItem value="product">Produto</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
                     <Input
-                      placeholder="Nome do serviço"
+                      placeholder={`Nome do ${serviceForm.category === 'service' ? 'serviço' : 'produto'}`}
                       value={serviceForm.name}
                       onChange={(e) => setServiceForm({...serviceForm, name: e.target.value})}
                       required
@@ -539,56 +643,63 @@ const Dashboard = ({ user, onLogout }) => {
                       required
                       data-testid="service-price-input"
                     />
-                    <Input
-                      type="number"
-                      placeholder="Duração (minutos)"
-                      value={serviceForm.duration_minutes}
-                      onChange={(e) => setServiceForm({...serviceForm, duration_minutes: e.target.value})}
-                      required
-                      data-testid="service-duration-input"
-                    />
-                    <Select
-                      value={serviceForm.category}
-                      onValueChange={(value) => setServiceForm({...serviceForm, category: value})}
-                    >
-                      <SelectTrigger data-testid="service-category-select">
-                        <SelectValue placeholder="Categoria" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="service">Serviço</SelectItem>
-                        <SelectItem value="product">Produto</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    
+                    {serviceForm.category === 'service' && (
+                      <Input
+                        type="number"
+                        placeholder="Duração (minutos)"
+                        value={serviceForm.duration_minutes}
+                        onChange={(e) => setServiceForm({...serviceForm, duration_minutes: e.target.value})}
+                        required
+                        data-testid="service-duration-input"
+                      />
+                    )}
+                    
+                    {serviceForm.category === 'product' && (
+                      <Input
+                        type="number"
+                        placeholder="Quantidade em estoque"
+                        value={serviceForm.stock_quantity}
+                        onChange={(e) => setServiceForm({...serviceForm, stock_quantity: e.target.value})}
+                        required
+                        data-testid="service-stock-input"
+                      />
+                    )}
+                    
                     <Button 
                       type="submit" 
                       className="w-full bg-emerald-600 hover:bg-emerald-700"
                       data-testid="create-service-btn"
                     >
-                      Cadastrar Serviço
+                      Cadastrar {serviceForm.category === 'service' ? 'Serviço' : 'Produto'}
                     </Button>
                   </form>
                 </CardContent>
               </Card>
 
-              <Card className="border-0 shadow-lg">
+              <Card className={`border-0 shadow-lg tab-card-${theme}`}>
                 <CardHeader>
-                  <CardTitle>Meus Serviços ({services.length})</CardTitle>
+                  <CardTitle className={`tab-card-title-${theme}`}>Meus Itens ({services.length})</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3 max-h-96 overflow-y-auto">
                     {services.map((service) => (
                       <div 
                         key={service.id} 
-                        className="flex justify-between items-center p-3 bg-slate-50 rounded-lg"
+                        className={`flex justify-between items-center p-3 service-item-${theme} rounded-lg`}
                         data-testid={`service-item-${service.id}`}
                       >
                         <div>
-                          <h4 className="font-medium text-slate-800">{service.name}</h4>
-                          <p className="text-sm text-slate-600">
-                            R$ {service.price.toFixed(2)} • {service.duration_minutes}min
+                          <h4 className={`font-medium service-item-title-${theme}`}>{service.name}</h4>
+                          <p className={`text-sm service-item-subtitle-${theme}`}>
+                            R$ {service.price.toFixed(2)}
+                            {service.category === 'service' && ` • ${service.duration_minutes}min`}
+                            {service.category === 'product' && ` • Estoque: ${service.stock_quantity}`}
                           </p>
                         </div>
-                        <Badge variant="secondary">{service.category}</Badge>
+                        <Badge variant={service.category === 'service' ? 'default' : 'secondary'}>
+                          {service.category === 'service' ? 'Serviço' : 'Produto'}
+                        </Badge>
                       </div>
                     ))}
                   </div>
@@ -600,9 +711,9 @@ const Dashboard = ({ user, onLogout }) => {
           {/* Financial Tab */}
           <TabsContent value="financial" className="space-y-6">
             <div className="grid lg:grid-cols-2 gap-6">
-              <Card className="border-0 shadow-lg">
+              <Card className={`border-0 shadow-lg tab-card-${theme}`}>
                 <CardHeader>
-                  <CardTitle>Novo Lançamento</CardTitle>
+                  <CardTitle className={`tab-card-title-${theme}`}>Novo Lançamento</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleCreateFinancialEntry} className="space-y-4">
@@ -618,6 +729,24 @@ const Dashboard = ({ user, onLogout }) => {
                         <SelectItem value="expense">Despesa</SelectItem>
                       </SelectContent>
                     </Select>
+                    
+                    <Select
+                      value={financialForm.service_id}
+                      onValueChange={(value) => setFinancialForm({...financialForm, service_id: value})}
+                    >
+                      <SelectTrigger data-testid="financial-service-select">
+                        <SelectValue placeholder="Selecione um item (opcional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Nenhum item específico</SelectItem>
+                        {services.map((service) => (
+                          <SelectItem key={service.id} value={service.id}>
+                            {service.name} - R$ {service.price.toFixed(2)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
                     <Input
                       placeholder="Descrição"
                       value={financialForm.description}
@@ -659,21 +788,21 @@ const Dashboard = ({ user, onLogout }) => {
                 </CardContent>
               </Card>
 
-              <Card className="border-0 shadow-lg">
+              <Card className={`border-0 shadow-lg tab-card-${theme}`}>
                 <CardHeader>
-                  <CardTitle>Últimos Lançamentos</CardTitle>
+                  <CardTitle className={`tab-card-title-${theme}`}>Últimos Lançamentos</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3 max-h-96 overflow-y-auto">
                     {financialEntries.slice(0, 10).map((entry) => (
                       <div 
                         key={entry.id} 
-                        className="flex justify-between items-center p-3 bg-slate-50 rounded-lg"
+                        className={`flex justify-between items-center p-3 financial-item-${theme} rounded-lg`}
                         data-testid={`financial-entry-${entry.id}`}
                       >
                         <div>
-                          <h4 className="font-medium text-slate-800">{entry.description}</h4>
-                          <p className="text-sm text-slate-600">{entry.category} • {entry.date}</p>
+                          <h4 className={`font-medium financial-item-title-${theme}`}>{entry.description}</h4>
+                          <p className={`text-sm financial-item-subtitle-${theme}`}>{entry.category} • {entry.date}</p>
                         </div>
                         <div className="text-right">
                           <span className={`font-semibold ${entry.type === 'income' ? 'text-emerald-600' : 'text-red-600'}`}>
@@ -690,27 +819,27 @@ const Dashboard = ({ user, onLogout }) => {
 
           {/* Appointments Tab */}
           <TabsContent value="appointments" className="space-y-6">
-            <Card className="border-0 shadow-lg">
+            <Card className={`border-0 shadow-lg tab-card-${theme}`}>
               <CardHeader>
-                <CardTitle>Agendamentos Pendentes ({appointments.filter(apt => apt.status === 'pending').length})</CardTitle>
+                <CardTitle className={`tab-card-title-${theme}`}>Agendamentos Pendentes ({appointments.filter(apt => apt.status === 'pending').length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {appointments.filter(apt => apt.status === 'pending').map((appointment) => (
-                    <Card key={appointment.id} className="bg-amber-50 border-amber-200" data-testid={`appointment-${appointment.id}`}>
+                    <Card key={appointment.id} className={`appointment-card-pending-${theme}`} data-testid={`appointment-${appointment.id}`}>
                       <CardContent className="pt-4">
                         <div className="flex justify-between items-start mb-4">
                           <div>
-                            <h4 className="font-semibold text-slate-800">{appointment.client_name}</h4>
-                            <p className="text-sm text-slate-600">{appointment.client_phone}</p>
-                            <p className="text-sm text-slate-600">{appointment.service_name}</p>
-                            <p className="text-sm text-slate-600">{appointment.date} às {appointment.time}</p>
+                            <h4 className={`font-semibold appointment-name-${theme}`}>{appointment.client_name}</h4>
+                            <p className={`text-sm appointment-detail-${theme}`}>{appointment.client_phone}</p>
+                            <p className={`text-sm appointment-detail-${theme}`}>{appointment.service_name}</p>
+                            <p className={`text-sm appointment-detail-${theme}`}>{appointment.date} às {appointment.time}</p>
                           </div>
                           <Badge variant="outline" className="border-amber-500 text-amber-700">
                             Pendente
                           </Badge>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                           <Button 
                             size="sm"
                             onClick={() => handleAppointmentUpdate(appointment.id, 'confirmed')}
@@ -728,13 +857,22 @@ const Dashboard = ({ user, onLogout }) => {
                           >
                             Recusar
                           </Button>
+                          <Button 
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setRescheduleDialog({ open: true, appointment, proposals: {} })}
+                            className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                            data-testid={`reschedule-appointment-${appointment.id}`}
+                          >
+                            Propor Reagendamento
+                          </Button>
                         </div>
                       </CardContent>
                     </Card>
                   ))}
                   
                   {appointments.filter(apt => apt.status === 'pending').length === 0 && (
-                    <div className="text-center py-8 text-slate-500">
+                    <div className={`text-center py-8 empty-state-${theme}`}>
                       Nenhum agendamento pendente
                     </div>
                   )}
@@ -743,22 +881,22 @@ const Dashboard = ({ user, onLogout }) => {
             </Card>
 
             {/* Confirmed Appointments */}
-            <Card className="border-0 shadow-lg">
+            <Card className={`border-0 shadow-lg tab-card-${theme}`}>
               <CardHeader>
-                <CardTitle>Agendamentos Confirmados</CardTitle>
+                <CardTitle className={`tab-card-title-${theme}`}>Agendamentos Confirmados</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {appointments.filter(apt => apt.status === 'confirmed').slice(0, 5).map((appointment) => (
                     <div 
                       key={appointment.id} 
-                      className="flex justify-between items-center p-3 bg-emerald-50 rounded-lg border border-emerald-200"
+                      className={`flex justify-between items-center p-3 appointment-confirmed-${theme} rounded-lg border`}
                       data-testid={`confirmed-appointment-${appointment.id}`}
                     >
                       <div>
-                        <h4 className="font-medium text-slate-800">{appointment.client_name}</h4>
-                        <p className="text-sm text-slate-600">{appointment.service_name}</p>
-                        <p className="text-sm text-slate-600">{appointment.date} às {appointment.time}</p>
+                        <h4 className={`font-medium appointment-name-${theme}`}>{appointment.client_name}</h4>
+                        <p className={`text-sm appointment-detail-${theme}`}>{appointment.service_name}</p>
+                        <p className={`text-sm appointment-detail-${theme}`}>{appointment.date} às {appointment.time}</p>
                       </div>
                       <Badge className="bg-emerald-600 text-white">Confirmado</Badge>
                     </div>
@@ -770,30 +908,130 @@ const Dashboard = ({ user, onLogout }) => {
 
           {/* Reports Tab */}
           <TabsContent value="reports" className="space-y-6">
-            <Card className="border-0 shadow-lg">
+            <Card className={`border-0 shadow-lg tab-card-${theme}`}>
               <CardHeader>
-                <CardTitle>Resumo Financeiro</CardTitle>
-                <CardDescription>Visão geral das suas finanças</CardDescription>
+                <CardTitle className={`tab-card-title-${theme}`}>Resumo Financeiro</CardTitle>
+                <CardDescription className={`tab-card-subtitle-${theme}`}>Visão geral das suas finanças</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-6">
-                  <div className="text-center p-6 bg-emerald-50 rounded-lg">
+                  <div className={`text-center p-6 report-card-income-${theme} rounded-lg`}>
                     <div className="text-3xl font-bold text-emerald-600">R$ {balance.income.toFixed(2)}</div>
-                    <div className="text-sm text-slate-600 mt-1">Total de Receitas</div>
+                    <div className={`text-sm report-label-${theme} mt-1`}>Total de Receitas</div>
                   </div>
-                  <div className="text-center p-6 bg-red-50 rounded-lg">
+                  <div className={`text-center p-6 report-card-expense-${theme} rounded-lg`}>
                     <div className="text-3xl font-bold text-red-600">R$ {balance.expenses.toFixed(2)}</div>
-                    <div className="text-sm text-slate-600 mt-1">Total de Despesas</div>
+                    <div className={`text-sm report-label-${theme} mt-1`}>Total de Despesas</div>
                   </div>
-                  <div className="text-center p-6 bg-blue-50 rounded-lg">
+                  <div className={`text-center p-6 report-card-balance-${theme} rounded-lg`}>
                     <div className="text-3xl font-bold text-blue-600">R$ {balance.balance.toFixed(2)}</div>
-                    <div className="text-sm text-slate-600 mt-1">Saldo Final</div>
+                    <div className={`text-sm report-label-${theme} mt-1`}>Saldo Final</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Reschedule Dialog */}
+        <Dialog open={rescheduleDialog.open} onOpenChange={(open) => setRescheduleDialog({...rescheduleDialog, open})}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Propor Reagendamento</DialogTitle>
+              <DialogDescription>
+                Ofereça 3 opções de horários para o cliente {rescheduleDialog.appointment?.client_name}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-2">
+                <Label>Opção 1:</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input
+                    type="date"
+                    value={rescheduleDialog.proposals.date1 || ''}
+                    onChange={(e) => setRescheduleDialog({
+                      ...rescheduleDialog,
+                      proposals: {...rescheduleDialog.proposals, date1: e.target.value}
+                    })}
+                  />
+                  <Input
+                    type="time"
+                    value={rescheduleDialog.proposals.time1 || ''}
+                    onChange={(e) => setRescheduleDialog({
+                      ...rescheduleDialog,
+                      proposals: {...rescheduleDialog.proposals, time1: e.target.value}
+                    })}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <Label>Opção 2:</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input
+                    type="date"
+                    value={rescheduleDialog.proposals.date2 || ''}
+                    onChange={(e) => setRescheduleDialog({
+                      ...rescheduleDialog,
+                      proposals: {...rescheduleDialog.proposals, date2: e.target.value}
+                    })}
+                  />
+                  <Input
+                    type="time"
+                    value={rescheduleDialog.proposals.time2 || ''}
+                    onChange={(e) => setRescheduleDialog({
+                      ...rescheduleDialog,
+                      proposals: {...rescheduleDialog.proposals, time2: e.target.value}
+                    })}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <Label>Opção 3:</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input
+                    type="date"
+                    value={rescheduleDialog.proposals.date3 || ''}
+                    onChange={(e) => setRescheduleDialog({
+                      ...rescheduleDialog,
+                      proposals: {...rescheduleDialog.proposals, date3: e.target.value}
+                    })}
+                  />
+                  <Input
+                    type="time"
+                    value={rescheduleDialog.proposals.time3 || ''}
+                    onChange={(e) => setRescheduleDialog({
+                      ...rescheduleDialog,
+                      proposals: {...rescheduleDialog.proposals, time3: e.target.value}
+                    })}
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label>Mensagem adicional:</Label>
+                <Textarea
+                  placeholder="Explique o motivo do reagendamento..."
+                  value={rescheduleDialog.proposals.message || ''}
+                  onChange={(e) => setRescheduleDialog({
+                    ...rescheduleDialog,
+                    proposals: {...rescheduleDialog.proposals, message: e.target.value}
+                  })}
+                />
+              </div>
+              
+              <div className="flex gap-2">
+                <Button onClick={handleProposeReschedule} className="flex-1">
+                  Enviar Proposta
+                </Button>
+                <Button variant="outline" onClick={() => setRescheduleDialog({open: false, appointment: null, proposals: {}})}>
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
@@ -801,8 +1039,10 @@ const Dashboard = ({ user, onLogout }) => {
 
 // Booking Page Component
 const BookingPage = () => {
+  const { theme } = useTheme();
   const [professional, setProfessional] = useState(null);
   const [services, setServices] = useState([]);
+  const [availableTimes, setAvailableTimes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [bookingForm, setBookingForm] = useState({
     client_name: '',
@@ -819,6 +1059,12 @@ const BookingPage = () => {
     loadProfessionalData();
   }, []);
 
+  useEffect(() => {
+    if (bookingForm.date) {
+      loadAvailableTimes();
+    }
+  }, [bookingForm.date]);
+
   const loadProfessionalData = async () => {
     try {
       const response = await axios.get(`${API}/public/professional/${userId}`);
@@ -828,6 +1074,15 @@ const BookingPage = () => {
       toast.error('Profissional não encontrado');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAvailableTimes = async () => {
+    try {
+      const response = await axios.get(`${API}/public/available-times/${userId}?date=${bookingForm.date}`);
+      setAvailableTimes(response.data.available_times);
+    } catch (error) {
+      console.error('Erro ao carregar horários disponíveis:', error);
     }
   };
 
@@ -851,10 +1106,10 @@ const BookingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-cyan-50 flex items-center justify-center">
+      <div className={`min-h-screen booking-bg-${theme} flex items-center justify-center`}>
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-600">Carregando informações...</p>
+          <p className={`booking-text-${theme}`}>Carregando informações...</p>
         </div>
       </div>
     );
@@ -862,11 +1117,11 @@ const BookingPage = () => {
 
   if (!professional) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-cyan-50 flex items-center justify-center">
-        <Card className="max-w-md mx-auto">
+      <div className={`min-h-screen booking-bg-${theme} flex items-center justify-center`}>
+        <Card className={`max-w-md mx-auto booking-card-${theme}`}>
           <CardContent className="text-center pt-6">
-            <h2 className="text-xl font-semibold text-slate-800 mb-2">Profissional não encontrado</h2>
-            <p className="text-slate-600">Verifique o link e tente novamente.</p>
+            <h2 className={`text-xl font-semibold booking-error-title-${theme} mb-2`}>Profissional não encontrado</h2>
+            <p className={`booking-error-text-${theme}`}>Verifique o link e tente novamente.</p>
           </CardContent>
         </Card>
       </div>
@@ -874,9 +1129,9 @@ const BookingPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-cyan-50">
+    <div className={`min-h-screen booking-bg-${theme}`}>
       <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-sm">
+        <Card className={`border-0 shadow-2xl booking-main-card-${theme}`}>
           <CardHeader className="text-center bg-gradient-to-r from-emerald-600 to-cyan-600 text-white rounded-t-lg">
             <CardTitle className="text-2xl">{professional.business_name}</CardTitle>
             <CardDescription className="text-emerald-100">
@@ -888,37 +1143,39 @@ const BookingPage = () => {
             <form onSubmit={handleBookingSubmit} className="space-y-6">
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="client_name">Seu Nome</Label>
+                  <Label htmlFor="client_name" className={`booking-label-${theme}`}>Seu Nome</Label>
                   <Input
                     id="client_name"
                     placeholder="Nome completo"
                     value={bookingForm.client_name}
                     onChange={(e) => setBookingForm({...bookingForm, client_name: e.target.value})}
                     required
+                    className={`booking-input-${theme}`}
                     data-testid="booking-name-input"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="client_phone">WhatsApp</Label>
+                  <Label htmlFor="client_phone" className={`booking-label-${theme}`}>WhatsApp</Label>
                   <Input
                     id="client_phone"
                     placeholder="(11) 99999-9999"
                     value={bookingForm.client_phone}
                     onChange={(e) => setBookingForm({...bookingForm, client_phone: e.target.value})}
                     required
+                    className={`booking-input-${theme}`}
                     data-testid="booking-phone-input"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="service_id">Serviço Desejado</Label>
+                  <Label htmlFor="service_id" className={`booking-label-${theme}`}>Serviço Desejado</Label>
                   <Select
                     value={bookingForm.service_id}
                     onValueChange={(value) => setBookingForm({...bookingForm, service_id: value})}
                     required
                   >
-                    <SelectTrigger data-testid="booking-service-select">
+                    <SelectTrigger className={`booking-select-${theme}`} data-testid="booking-service-select">
                       <SelectValue placeholder="Selecione um serviço" />
                     </SelectTrigger>
                     <SelectContent>
@@ -931,40 +1188,50 @@ const BookingPage = () => {
                   </Select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="date">Data Preferida</Label>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={bookingForm.date}
-                      onChange={(e) => setBookingForm({...bookingForm, date: e.target.value})}
-                      min={new Date().toISOString().split('T')[0]}
-                      required
-                      data-testid="booking-date-input"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="time">Horário Preferido</Label>
-                    <Input
-                      id="time"
-                      type="time"
-                      value={bookingForm.time}
-                      onChange={(e) => setBookingForm({...bookingForm, time: e.target.value})}
-                      required
-                      data-testid="booking-time-input"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="date" className={`booking-label-${theme}`}>Data Preferida</Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    value={bookingForm.date}
+                    onChange={(e) => setBookingForm({...bookingForm, date: e.target.value, time: ''})}
+                    min={new Date().toISOString().split('T')[0]}
+                    required
+                    className={`booking-input-${theme}`}
+                    data-testid="booking-date-input"
+                  />
                 </div>
 
+                {bookingForm.date && (
+                  <div>
+                    <Label htmlFor="time" className={`booking-label-${theme}`}>Horário Preferido</Label>
+                    <Select
+                      value={bookingForm.time}
+                      onValueChange={(value) => setBookingForm({...bookingForm, time: value})}
+                      required
+                    >
+                      <SelectTrigger className={`booking-select-${theme}`} data-testid="booking-time-select">
+                        <SelectValue placeholder="Selecione um horário" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableTimes.map((time) => (
+                          <SelectItem key={time} value={time}>
+                            {time}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
                 <div>
-                  <Label htmlFor="notes">Observações (Opcional)</Label>
+                  <Label htmlFor="notes" className={`booking-label-${theme}`}>Observações (Opcional)</Label>
                   <Textarea
                     id="notes"
                     placeholder="Alguma informação adicional?"
                     value={bookingForm.notes}
                     onChange={(e) => setBookingForm({...bookingForm, notes: e.target.value})}
+                    className={`booking-textarea-${theme}`}
                     data-testid="booking-notes-input"
                   />
                 </div>
@@ -973,14 +1240,15 @@ const BookingPage = () => {
               <Button 
                 type="submit" 
                 className="w-full bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white py-3 text-lg"
+                disabled={!bookingForm.time}
                 data-testid="submit-booking-btn"
               >
                 Solicitar Agendamento
               </Button>
             </form>
 
-            <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
-              <p className="text-sm text-amber-800 text-center">
+            <div className={`mt-6 p-4 booking-warning-${theme} rounded-lg border`}>
+              <p className={`text-sm booking-warning-text-${theme} text-center`}>
                 <strong>Importante:</strong> Seu agendamento será enviado para análise. 
                 Aguarde a confirmação via WhatsApp no número informado.
               </p>
@@ -1033,36 +1301,34 @@ function App() {
     setCurrentView('landing');
   };
 
-  if (currentView === 'booking') {
-    return (
-      <BrowserRouter>
-        <BookingPage />
-      </BrowserRouter>
-    );
-  }
-
   return (
-    <BrowserRouter>
-      <div className="App">
-        {currentView === 'landing' && (
-          <LandingPage onShowAuth={handleShowAuth} />
-        )}
-        
-        {currentView === 'auth' && (
-          <AuthComponent 
-            onLoginSuccess={handleLoginSuccess}
-            onBack={handleBackToLanding}
-          />
-        )}
-        
-        {currentView === 'dashboard' && user && (
-          <Dashboard 
-            user={user}
-            onLogout={handleLogout}
-          />
-        )}
-      </div>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <div className="App">
+          {currentView === 'landing' && (
+            <LandingPage onShowAuth={handleShowAuth} />
+          )}
+          
+          {currentView === 'auth' && (
+            <AuthComponent 
+              onLoginSuccess={handleLoginSuccess}
+              onBack={handleBackToLanding}
+            />
+          )}
+          
+          {currentView === 'dashboard' && user && (
+            <Dashboard 
+              user={user}
+              onLogout={handleLogout}
+            />
+          )}
+          
+          {currentView === 'booking' && (
+            <BookingPage />
+          )}
+        </div>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
