@@ -782,22 +782,40 @@ const Dashboard = ({ user, onLogout }) => {
                       </SelectContent>
                     </Select>
                     
-                    <Select
-                      value={financialForm.service_id}
-                      onValueChange={(value) => setFinancialForm({...financialForm, service_id: value === "none" ? "" : value})}
-                    >
-                      <SelectTrigger data-testid="financial-service-select">
-                        <SelectValue placeholder="Selecione um item (opcional)" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Nenhum item específico</SelectItem>
+                    <div>
+                      <Label className={`tab-card-title-${theme}`}>Serviços (opcional)</Label>
+                      <div className="border rounded-md p-3 max-h-40 overflow-y-auto space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id="no-service"
+                            checked={financialForm.service_ids.length === 0}
+                            onChange={() => setFinancialForm({...financialForm, service_ids: [], amount: ''})}
+                            className="rounded"
+                          />
+                          <Label htmlFor="no-service" className="text-sm">Nenhum serviço específico</Label>
+                        </div>
                         {services.map((service) => (
-                          <SelectItem key={service.id} value={service.id}>
-                            {service.name} - R$ {service.price.toFixed(2)}
-                          </SelectItem>
+                          <div key={service.id} className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              id={`service-${service.id}`}
+                              checked={financialForm.service_ids.includes(service.id)}
+                              onChange={() => handleServiceSelection(service.id)}
+                              className="rounded"
+                            />
+                            <Label htmlFor={`service-${service.id}`} className="text-sm flex-1">
+                              {service.name} - R$ {service.price.toFixed(2)}
+                            </Label>
+                          </div>
                         ))}
-                      </SelectContent>
-                    </Select>
+                      </div>
+                      {financialForm.service_ids.length > 0 && (
+                        <p className="text-sm text-emerald-600 mt-2">
+                          Total selecionado: R$ {calculateTotalPrice(financialForm.service_ids).toFixed(2)}
+                        </p>
+                      )}
+                    </div>
                     
                     <Input
                       placeholder="Descrição"
