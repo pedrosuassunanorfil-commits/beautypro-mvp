@@ -57,8 +57,10 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test"
+    "test": "craco test",
+    "deploy": "npm run build"
   },
+  "homepage": ".",
   "browserslist": {
     "production": [
       ">0.2%",
