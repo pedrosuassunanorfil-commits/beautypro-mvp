@@ -431,7 +431,34 @@ const Dashboard = ({ user, onLogout }) => {
     }
   };
 
-  const handleCreateFinancialEntry = async (e) => {
+  // Function to calculate total price from selected services
+  const calculateTotalPrice = (serviceIds) => {
+    if (serviceIds.length === 0) return 0;
+    return serviceIds.reduce((total, serviceId) => {
+      const service = services.find(s => s.id === serviceId);
+      return total + (service ? service.price : 0);
+    }, 0);
+  };
+
+  // Function to handle service selection
+  const handleServiceSelection = (serviceId) => {
+    let newServiceIds;
+    if (financialForm.service_ids.includes(serviceId)) {
+      // Remove service if already selected
+      newServiceIds = financialForm.service_ids.filter(id => id !== serviceId);
+    } else {
+      // Add service if not selected
+      newServiceIds = [...financialForm.service_ids, serviceId];
+    }
+    
+    const totalPrice = calculateTotalPrice(newServiceIds);
+    
+    setFinancialForm({
+      ...financialForm,
+      service_ids: newServiceIds,
+      amount: totalPrice > 0 ? totalPrice.toString() : ''
+    });
+  };
     e.preventDefault();
     try {
       await axios.post(`${API}/financial`, {
