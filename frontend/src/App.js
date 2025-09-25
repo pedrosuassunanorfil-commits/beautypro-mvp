@@ -732,13 +732,13 @@ const Dashboard = ({ user, onLogout }) => {
                     
                     <Select
                       value={financialForm.service_id}
-                      onValueChange={(value) => setFinancialForm({...financialForm, service_id: value})}
+                      onValueChange={(value) => setFinancialForm({...financialForm, service_id: value === "none" ? "" : value})}
                     >
                       <SelectTrigger data-testid="financial-service-select">
                         <SelectValue placeholder="Selecione um item (opcional)" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Nenhum item específico</SelectItem>
+                        <SelectItem value="none">Nenhum item específico</SelectItem>
                         {services.map((service) => (
                           <SelectItem key={service.id} value={service.id}>
                             {service.name} - R$ {service.price.toFixed(2)}
