@@ -81,7 +81,7 @@ class FinancialEntryCreate(BaseModel):
     description: str
     amount: float
     category: str
-    service_id: Optional[str] = None
+    service_ids: Optional[List[str]] = []
     date: str
 
 class FinancialEntry(BaseModel):
