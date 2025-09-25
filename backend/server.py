@@ -450,9 +450,9 @@ async def get_professional_info(user_id: str):
 @api_router.get("/public/available-times/{user_id}")
 async def get_available_times(user_id: str, date: str):
     """Get available appointment times for a specific date"""
-    # Generate time slots from 8:00 to 18:00 in 30-minute intervals
+    # Generate time slots from 7:00 to 20:00 in 30-minute intervals
     time_slots = []
-    for hour in range(8, 18):
+    for hour in range(7, 20):
         for minute in [0, 30]:
             time_slots.append(f"{hour:02d}:{minute:02d}")
     
