@@ -474,7 +474,7 @@ const Dashboard = ({ user, onLogout }) => {
         description: '',
         amount: '',
         category: '',
-        service_id: '',
+        service_ids: [],
         date: new Date().toISOString().split('T')[0]
       });
       loadDashboardData();
