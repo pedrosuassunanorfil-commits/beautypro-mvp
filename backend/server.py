@@ -120,6 +120,7 @@ class AppointmentUpdate(BaseModel):
     status: str = Field(..., pattern="^(confirmed|rejected|rescheduled)$")
     new_date: Optional[str] = None
     new_time: Optional[str] = None
+    reschedule_proposal: Optional[Dict[str, str]] = None  # For proposing new times
 
 # Helper Functions
 def hash_password(password: str) -> str:
