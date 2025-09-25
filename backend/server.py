@@ -289,7 +289,7 @@ async def create_financial_entry(entry_data: FinancialEntryCreate, current_user 
         "description": entry_data.description,
         "amount": entry_data.amount,
         "category": entry_data.category,
-        "service_id": entry_data.service_id,
+        "service_ids": entry_data.service_ids or [],
         "date": entry_data.date,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
