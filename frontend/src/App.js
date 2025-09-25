@@ -459,6 +459,8 @@ const Dashboard = ({ user, onLogout }) => {
       amount: totalPrice > 0 ? totalPrice.toString() : ''
     });
   };
+
+  const handleCreateFinancialEntry = async (e) => {
     e.preventDefault();
     try {
       await axios.post(`${API}/financial`, {
