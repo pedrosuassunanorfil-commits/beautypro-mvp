@@ -317,7 +317,21 @@ async def get_financial_entries(
         query["type"] = entry_type
     
     entries = await db.financial_entries.find(query).sort("date", -1).to_list(length=None)
-    return [FinancialEntry(**parse_from_mongo(entry)) for entry in entries]
+    
+    # Handle backward compatibility for service_id -> service_ids migration
+    processed_entries = []
+    for entry in entries:
+        entry_data = parse_from_mongo(entry)
+        
+        # Convert old service_id to service_ids for compatibility
+        if 'service_id' in entry_data and 'service_ids' not in entry_data:
+            entry_data['service_ids'] = [entry_data['service_id']] if entry_data['service_id'] else []
+        elif 'service_ids' not in entry_data:
+            entry_data['service_ids'] = []
+            
+        processed_entries.append(FinancialEntry(**entry_data))
+    
+    return processed_entries
 
 @api_router.get("/financial/balance")
 async def get_financial_balance(
