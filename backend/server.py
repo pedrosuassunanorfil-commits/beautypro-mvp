@@ -244,7 +244,16 @@ async def create_service(service_data: ServiceCreate, current_user = Depends(get
 @api_router.get("/services", response_model=List[Service])
 async def get_services(current_user = Depends(get_current_user)):
     services = await db.services.find({"user_id": current_user["_id"]}).to_list(length=None)
-    return [Service(**parse_from_mongo(service)) for service in services]
+    
+    # Parse services manually to handle missing stock_quantity field
+    service_list = []
+    for service in services:
+        service_data = parse_from_mongo(service)
+        if 'stock_quantity' not in service_data:
+            service_data['stock_quantity'] = None
+        service_list.append(Service(**service_data))
+    
+    return service_list
 
 @api_router.put("/services/{service_id}", response_model=Service)
 async def update_service(service_id: str, service_data: ServiceCreate, current_user = Depends(get_current_user)):
