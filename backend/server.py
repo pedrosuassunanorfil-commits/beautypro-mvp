@@ -115,7 +115,7 @@ class Appointment(BaseModel):
     created_at: datetime
 
 class AppointmentUpdate(BaseModel):
-    status: str = Field(..., regex="^(confirmed|rejected|rescheduled)$")
+    status: str = Field(..., pattern="^(confirmed|rejected|rescheduled)$")
     new_date: Optional[str] = None
     new_time: Optional[str] = None
 
