@@ -75,7 +75,7 @@ class Service(BaseModel):
     created_at: datetime
 
 class FinancialEntryCreate(BaseModel):
-    type: str = Field(..., regex="^(income|expense)$")
+    type: str = Field(..., pattern="^(income|expense)$")
     description: str
     amount: float
     category: str
