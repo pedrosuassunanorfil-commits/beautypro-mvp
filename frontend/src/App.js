@@ -368,7 +368,7 @@ const Dashboard = ({ user, onLogout }) => {
     description: '',
     amount: '',
     category: '',
-    service_id: '',
+    service_ids: [], // Changed to array for multiple selections
     date: new Date().toISOString().split('T')[0]
   });
 
