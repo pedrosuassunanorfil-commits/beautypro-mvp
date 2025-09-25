@@ -538,6 +538,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Health check endpoint
+@app.get("/")
+async def health_check():
+    return {"status": "healthy", "message": "BeautyPro API is running"}
+
+@app.get("/api/")
+async def api_health_check():
+    return {"status": "healthy", "message": "BeautyPro API is running", "version": "1.0.0"}
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
