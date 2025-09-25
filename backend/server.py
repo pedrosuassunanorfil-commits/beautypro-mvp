@@ -61,8 +61,9 @@ class ServiceCreate(BaseModel):
     name: str
     description: Optional[str] = None
     price: float
-    duration_minutes: int
-    category: str = "service"
+    duration_minutes: int = 0  # 0 for products
+    category: str = Field(..., pattern="^(service|product)$")
+    stock_quantity: Optional[int] = None  # Only for products
 
 class Service(BaseModel):
     id: str
@@ -72,6 +73,7 @@ class Service(BaseModel):
     price: float
     duration_minutes: int
     category: str
+    stock_quantity: Optional[int]
     created_at: datetime
 
 class FinancialEntryCreate(BaseModel):
