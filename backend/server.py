@@ -1,15 +1,18 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, BackgroundTasks
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+from passlib.context import CryptContext
+from datetime import datetime, timedelta, date, time, timezone
+from typing import List, Optional, Dict, Any
+from pydantic import BaseModel, Field, EmailStr
 import os
 import logging
-from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List
+import jwt
 import uuid
-from datetime import datetime
-
+import asyncio
+from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,38 +22,409 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# Security
+SECRET_KEY = os.environ.get('JWT_SECRET', 'your-secret-key')
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30 * 24 * 60  # 30 days
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+security = HTTPBearer()
+
 # Create the main app without a prefix
-app = FastAPI()
+app = FastAPI(title="Sistema SaaS Estética", version="1.0.0")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Pydantic Models
+class UserRegister(BaseModel):
+    name: str = Field(..., min_length=2)
+    email: EmailStr
+    password: str = Field(..., min_length=6)
+    phone: str
+    business_name: str
 
-# Define Models
-class StatusCheck(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class User(BaseModel):
+    id: str
+    name: str
+    email: str
+    phone: str
+    business_name: str
+    subscription_status: str = "inactive"
+    created_at: datetime
+
+class ServiceCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    price: float
+    duration_minutes: int
+    category: str = "service"
+
+class Service(BaseModel):
+    id: str
+    user_id: str
+    name: str
+    description: Optional[str]
+    price: float
+    duration_minutes: int
+    category: str
+    created_at: datetime
+
+class FinancialEntryCreate(BaseModel):
+    type: str = Field(..., regex="^(income|expense)$")
+    description: str
+    amount: float
+    category: str
+    service_id: Optional[str] = None
+    date: str
+
+class FinancialEntry(BaseModel):
+    id: str
+    user_id: str
+    type: str
+    description: str
+    amount: float
+    category: str
+    service_id: Optional[str]
+    date: str
+    created_at: datetime
+
+class AppointmentCreate(BaseModel):
     client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    client_phone: str
+    service_id: str
+    date: str
+    time: str
+    notes: Optional[str] = None
 
-class StatusCheckCreate(BaseModel):
+class Appointment(BaseModel):
+    id: str
+    user_id: str
     client_name: str
+    client_phone: str
+    service_id: str
+    service_name: str
+    date: str
+    time: str
+    status: str = "pending"
+    notes: Optional[str]
+    created_at: datetime
 
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
+class AppointmentUpdate(BaseModel):
+    status: str = Field(..., regex="^(confirmed|rejected|rescheduled)$")
+    new_date: Optional[str] = None
+    new_time: Optional[str] = None
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
+# Helper Functions
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Token inválido")
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    
+    user = await db.users.find_one({"_id": user_id})
+    if user is None:
+        raise HTTPException(status_code=401, detail="Usuário não encontrado")
+    return user
+
+def prepare_for_mongo(data):
+    """Prepare data for MongoDB storage"""
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if isinstance(value, date):
+                data[key] = value.isoformat()
+            elif isinstance(value, time):
+                data[key] = value.strftime('%H:%M:%S')
+            elif isinstance(value, datetime):
+                data[key] = value.isoformat()
+    return data
+
+def parse_from_mongo(item):
+    """Parse data from MongoDB"""
+    if item and '_id' in item:
+        item['id'] = item.pop('_id')
+    return item
+
+# Authentication Routes
+@api_router.post("/auth/register")
+async def register(user_data: UserRegister):
+    # Check if user exists
+    existing_user = await db.users.find_one({"email": user_data.email})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email já cadastrado")
+    
+    # Create user
+    user_id = str(uuid.uuid4())
+    hashed_password = hash_password(user_data.password)
+    
+    user_doc = {
+        "_id": user_id,
+        "name": user_data.name,
+        "email": user_data.email,
+        "password": hashed_password,
+        "phone": user_data.phone,
+        "business_name": user_data.business_name,
+        "subscription_status": "inactive",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.users.insert_one(user_doc)
+    
+    # Create access token
+    access_token = create_access_token(data={"sub": user_id})
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": User(**parse_from_mongo(user_doc))
+    }
+
+@api_router.post("/auth/login")
+async def login(user_data: UserLogin):
+    user = await db.users.find_one({"email": user_data.email})
+    if not user or not verify_password(user_data.password, user["password"]):
+        raise HTTPException(status_code=401, detail="Email ou senha incorretos")
+    
+    access_token = create_access_token(data={"sub": user["_id"]})
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": User(**parse_from_mongo(user))
+    }
+
+# User Routes
+@api_router.get("/user/profile", response_model=User)
+async def get_profile(current_user = Depends(get_current_user)):
+    return User(**parse_from_mongo(current_user))
+
+# Services Routes
+@api_router.post("/services", response_model=Service)
+async def create_service(service_data: ServiceCreate, current_user = Depends(get_current_user)):
+    service_id = str(uuid.uuid4())
+    
+    service_doc = {
+        "_id": service_id,
+        "user_id": current_user["_id"],
+        "name": service_data.name,
+        "description": service_data.description,
+        "price": service_data.price,
+        "duration_minutes": service_data.duration_minutes,
+        "category": service_data.category,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.services.insert_one(service_doc)
+    return Service(**parse_from_mongo(service_doc))
+
+@api_router.get("/services", response_model=List[Service])
+async def get_services(current_user = Depends(get_current_user)):
+    services = await db.services.find({"user_id": current_user["_id"]}).to_list(length=None)
+    return [Service(**parse_from_mongo(service)) for service in services]
+
+@api_router.put("/services/{service_id}", response_model=Service)
+async def update_service(service_id: str, service_data: ServiceCreate, current_user = Depends(get_current_user)):
+    result = await db.services.update_one(
+        {"_id": service_id, "user_id": current_user["_id"]},
+        {"$set": service_data.dict()}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Serviço não encontrado")
+    
+    updated_service = await db.services.find_one({"_id": service_id})
+    return Service(**parse_from_mongo(updated_service))
+
+@api_router.delete("/services/{service_id}")
+async def delete_service(service_id: str, current_user = Depends(get_current_user)):
+    result = await db.services.delete_one({"_id": service_id, "user_id": current_user["_id"]})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Serviço não encontrado")
+    
+    return {"message": "Serviço excluído com sucesso"}
+
+# Financial Routes
+@api_router.post("/financial", response_model=FinancialEntry)
+async def create_financial_entry(entry_data: FinancialEntryCreate, current_user = Depends(get_current_user)):
+    entry_id = str(uuid.uuid4())
+    
+    entry_doc = {
+        "_id": entry_id,
+        "user_id": current_user["_id"],
+        "type": entry_data.type,
+        "description": entry_data.description,
+        "amount": entry_data.amount,
+        "category": entry_data.category,
+        "service_id": entry_data.service_id,
+        "date": entry_data.date,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.financial_entries.insert_one(entry_doc)
+    return FinancialEntry(**parse_from_mongo(entry_doc))
+
+@api_router.get("/financial", response_model=List[FinancialEntry])
+async def get_financial_entries(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    entry_type: Optional[str] = None,
+    current_user = Depends(get_current_user)
+):
+    query = {"user_id": current_user["_id"]}
+    
+    if start_date:
+        query["date"] = {"$gte": start_date}
+    if end_date:
+        if "date" in query:
+            query["date"]["$lte"] = end_date
+        else:
+            query["date"] = {"$lte": end_date}
+    if entry_type:
+        query["type"] = entry_type
+    
+    entries = await db.financial_entries.find(query).sort("date", -1).to_list(length=None)
+    return [FinancialEntry(**parse_from_mongo(entry)) for entry in entries]
+
+@api_router.get("/financial/balance")
+async def get_financial_balance(
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user = Depends(get_current_user)
+):
+    query = {"user_id": current_user["_id"]}
+    
+    if start_date:
+        query["date"] = {"$gte": start_date}
+    if end_date:
+        if "date" in query:
+            query["date"]["$lte"] = end_date
+        else:
+            query["date"] = {"$lte": end_date}
+    
+    entries = await db.financial_entries.find(query).to_list(length=None)
+    
+    income = sum(entry["amount"] for entry in entries if entry["type"] == "income")
+    expenses = sum(entry["amount"] for entry in entries if entry["type"] == "expense")
+    balance = income - expenses
+    
+    return {
+        "income": income,
+        "expenses": expenses,
+        "balance": balance,
+        "period": {"start_date": start_date, "end_date": end_date}
+    }
+
+# Appointment Routes
+@api_router.post("/appointments/public/{user_id}")
+async def create_public_appointment(user_id: str, appointment_data: AppointmentCreate):
+    # Verify user exists
+    user = await db.users.find_one({"_id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="Profissional não encontrado")
+    
+    # Verify service exists
+    service = await db.services.find_one({"_id": appointment_data.service_id, "user_id": user_id})
+    if not service:
+        raise HTTPException(status_code=404, detail="Serviço não encontrado")
+    
+    appointment_id = str(uuid.uuid4())
+    
+    appointment_doc = {
+        "_id": appointment_id,
+        "user_id": user_id,
+        "client_name": appointment_data.client_name,
+        "client_phone": appointment_data.client_phone,
+        "service_id": appointment_data.service_id,
+        "service_name": service["name"],
+        "date": appointment_data.date,
+        "time": appointment_data.time,
+        "status": "pending",
+        "notes": appointment_data.notes,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.appointments.insert_one(appointment_doc)
+    return {
+        "message": "Agendamento solicitado com sucesso! Aguarde a confirmação do profissional.",
+        "appointment": Appointment(**parse_from_mongo(appointment_doc))
+    }
+
+@api_router.get("/appointments", response_model=List[Appointment])
+async def get_appointments(
+    date: Optional[str] = None,
+    status: Optional[str] = None,
+    current_user = Depends(get_current_user)
+):
+    query = {"user_id": current_user["_id"]}
+    
+    if date:
+        query["date"] = date
+    if status:
+        query["status"] = status
+    
+    appointments = await db.appointments.find(query).sort("date", 1).sort("time", 1).to_list(length=None)
+    return [Appointment(**parse_from_mongo(appointment)) for appointment in appointments]
+
+@api_router.put("/appointments/{appointment_id}")
+async def update_appointment_status(
+    appointment_id: str,
+    update_data: AppointmentUpdate,
+    current_user = Depends(get_current_user)
+):
+    update_doc = {"status": update_data.status}
+    
+    if update_data.status == "rescheduled" and update_data.new_date and update_data.new_time:
+        update_doc["date"] = update_data.new_date
+        update_doc["time"] = update_data.new_time
+    
+    result = await db.appointments.update_one(
+        {"_id": appointment_id, "user_id": current_user["_id"]},
+        {"$set": update_doc}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Agendamento não encontrado")
+    
+    return {"message": f"Agendamento {update_data.status} com sucesso"}
+
+# Public Routes for Booking System
+@api_router.get("/public/professional/{user_id}")
+async def get_professional_info(user_id: str):
+    user = await db.users.find_one({"_id": user_id}, {"password": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="Profissional não encontrado")
+    
+    services = await db.services.find({"user_id": user_id}).to_list(length=None)
+    
+    return {
+        "professional": {
+            "name": user["name"],
+            "business_name": user["business_name"],
+            "phone": user["phone"]
+        },
+        "services": [Service(**parse_from_mongo(service)) for service in services]
+    }
 
 # Include the router in the main app
 app.include_router(api_router)
