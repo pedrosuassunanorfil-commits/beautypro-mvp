@@ -419,7 +419,7 @@ async def get_professional_info(user_id: str):
     if not user:
         raise HTTPException(status_code=404, detail="Profissional não encontrado")
     
-    services = await db.services.find({"user_id": user_id}).to_list(length=None)
+    services = await db.services.find({"user_id": user_id, "category": "service"}).to_list(length=None)
     
     return {
         "professional": {
@@ -428,6 +428,71 @@ async def get_professional_info(user_id: str):
             "phone": user["phone"]
         },
         "services": [Service(**parse_from_mongo(service)) for service in services]
+    }
+
+@api_router.get("/public/available-times/{user_id}")
+async def get_available_times(user_id: str, date: str):
+    """Get available appointment times for a specific date"""
+    # Generate time slots from 8:00 to 18:00 in 30-minute intervals
+    time_slots = []
+    for hour in range(8, 18):
+        for minute in [0, 30]:
+            time_slots.append(f"{hour:02d}:{minute:02d}")
+    
+    # Get existing appointments for the date
+    existing_appointments = await db.appointments.find({
+        "user_id": user_id,
+        "date": date,
+        "status": {"$in": ["pending", "confirmed"]}
+    }).to_list(length=None)
+    
+    booked_times = [apt["time"] for apt in existing_appointments]
+    available_times = [time for time in time_slots if time not in booked_times]
+    
+    return {"available_times": available_times}
+
+@api_router.post("/appointments/{appointment_id}/propose-reschedule")
+async def propose_reschedule(
+    appointment_id: str,
+    proposal: Dict[str, str],
+    current_user = Depends(get_current_user)
+):
+    """Professional proposes new times for rescheduling"""
+    appointment = await db.appointments.find_one({
+        "_id": appointment_id,
+        "user_id": current_user["_id"]
+    })
+    
+    if not appointment:
+        raise HTTPException(status_code=404, detail="Agendamento não encontrado")
+    
+    # Update appointment with reschedule proposal
+    await db.appointments.update_one(
+        {"_id": appointment_id},
+        {
+            "$set": {
+                "status": "reschedule_proposed",
+                "reschedule_proposal": {
+                    "date1": proposal.get("date1"),
+                    "time1": proposal.get("time1"),
+                    "date2": proposal.get("date2"),
+                    "time2": proposal.get("time2"),
+                    "date3": proposal.get("date3"),
+                    "time3": proposal.get("time3"),
+                    "message": proposal.get("message", "")
+                }
+            }
+        }
+    )
+    
+    return {
+        "message": "Proposta de reagendamento enviada",
+        "whatsapp_message": f"Olá {appointment['client_name']}! Preciso reagendar seu atendimento. Estas são as opções disponíveis:\n\n" +
+                           f"Opção 1: {proposal.get('date1')} às {proposal.get('time1')}\n" +
+                           f"Opção 2: {proposal.get('date2')} às {proposal.get('time2')}\n" +
+                           f"Opção 3: {proposal.get('date3')} às {proposal.get('time3')}\n\n" +
+                           f"Mensagem: {proposal.get('message', '')}\n\n" +
+                           f"Por favor, responda qual opção prefere ou se nenhuma funciona."
     }
 
 # Include the router in the main app
