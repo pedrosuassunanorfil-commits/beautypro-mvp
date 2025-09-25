@@ -487,9 +487,31 @@ const Dashboard = ({ user, onLogout }) => {
     return `${window.location.origin}/booking/${user.id}`;
   };
 
-  const copyBookingLink = () => {
-    navigator.clipboard.writeText(getBookingLink());
-    toast.success('Link de agendamento copiado!');
+  const copyBookingLink = async () => {
+    const text = getBookingLink();
+    
+    try {
+      // Try modern Clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        toast.success('Link de agendamento copiado!');
+      } else {
+        // Fallback to older method
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        toast.success('Link de agendamento copiado!');
+      }
+    } catch (err) {
+      // If both methods fail, show the link in a dialog
+      toast.error('Não foi possível copiar automaticamente. Link: ' + text.substring(0, 50) + '...');
+      console.error('Failed to copy text: ', err);
+    }
   };
 
   if (loading) {
