@@ -421,13 +421,21 @@ async def get_professional_info(user_id: str):
     
     services = await db.services.find({"user_id": user_id, "category": "service"}).to_list(length=None)
     
+    # Parse services manually to handle missing stock_quantity field
+    service_list = []
+    for service in services:
+        service_data = parse_from_mongo(service)
+        if 'stock_quantity' not in service_data:
+            service_data['stock_quantity'] = None
+        service_list.append(Service(**service_data))
+    
     return {
         "professional": {
             "name": user["name"],
             "business_name": user["business_name"],
             "phone": user["phone"]
         },
-        "services": [Service(**parse_from_mongo(service)) for service in services]
+        "services": service_list
     }
 
 @api_router.get("/public/available-times/{user_id}")
