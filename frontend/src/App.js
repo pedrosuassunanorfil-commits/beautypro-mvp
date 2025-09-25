@@ -35,7 +35,9 @@ const ThemeContext = React.createContext();
 
 const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'default';
+    const savedTheme = localStorage.getItem('theme') || 'default';
+    // Validate theme - if gray is selected, fallback to default
+    return savedTheme === 'gray' ? 'default' : savedTheme;
   });
 
   const toggleTheme = (newTheme) => {
