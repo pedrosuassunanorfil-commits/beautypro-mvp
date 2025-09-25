@@ -334,7 +334,7 @@ const ThemeSelector = () => {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="default">Padrão</SelectItem>
-          <SelectItem value="dark">Preto</SelectItem>
+          <SelectItem value="gray">Cinza</SelectItem>
           <SelectItem value="pink">Rosa</SelectItem>
         </SelectContent>
       </Select>
