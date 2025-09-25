@@ -233,6 +233,7 @@ async def create_service(service_data: ServiceCreate, current_user = Depends(get
         "price": service_data.price,
         "duration_minutes": service_data.duration_minutes,
         "category": service_data.category,
+        "stock_quantity": service_data.stock_quantity,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     
