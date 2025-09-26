@@ -22,5 +22,7 @@
   ],
   "env": {
     "REACT_APP_BACKEND_URL": "https://beauty-saas-2.preview.emergentagent.com"
-  }
+  },
+  "installCommand": "yarn install",
+  "buildCommand": "yarn vercel-build"
 }
