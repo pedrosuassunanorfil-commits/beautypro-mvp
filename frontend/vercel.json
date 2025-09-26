@@ -1,14 +1,5 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
-    }
-  ],
   "routes": [
     {
       "src": "/static/(.*)",
@@ -19,10 +10,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "REACT_APP_BACKEND_URL": "https://beauty-saas-2.preview.emergentagent.com"
-  },
-  "installCommand": "yarn install",
-  "buildCommand": "yarn vercel-build"
+  ]
 }
