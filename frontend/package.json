@@ -61,7 +61,6 @@
     "deploy": "npm run build",
     "vercel-build": "CI=false craco build"
   },
-  "homepage": ".",
   "browserslist": {
     "production": [
       ">0.2%",
